@@ -1,0 +1,14 @@
+language: ruby
+
+sudo: required
+
+services:
+  - rabbitmq
+
+rvm:
+  - "2.5.1"
+
+cache:
+  bundler: true
+
+script: 'bundle exec rspec'
