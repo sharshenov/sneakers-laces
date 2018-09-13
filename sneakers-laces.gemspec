@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'activesupport'
   spec.add_dependency 'rabbitmq_http_api_client'
   spec.add_dependency 'sneakers'
 

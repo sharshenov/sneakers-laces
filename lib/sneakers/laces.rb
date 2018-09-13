@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
+require 'rabbitmq/http/client'
+require 'active_support'
+require 'active_support/core_ext'
+
 require 'sneakers/laces/version'
 require 'sneakers/laces/configuration'
+require 'sneakers/laces/queue_manager'
+require 'sneakers/laces/consumer_manager'
 require 'sneakers'
-require 'rabbitmq/http/client'
 
 module Sneakers
   module Laces
