@@ -9,3 +9,11 @@ Metrics/LineLength:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+
+Naming/ConstantName:
+  Exclude:
+    - 'lib/sneakers/laces/worker.rb'
+
+Style/MutableConstant:
+  Exclude:
+    - 'lib/sneakers/laces/worker.rb'

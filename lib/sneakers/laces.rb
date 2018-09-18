@@ -8,6 +8,7 @@ require 'sneakers/laces/version'
 require 'sneakers/laces/configuration'
 require 'sneakers/laces/queue_manager'
 require 'sneakers/laces/consumer_manager'
+require 'sneakers/laces/worker'
 require 'sneakers'
 
 module Sneakers

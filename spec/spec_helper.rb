@@ -3,7 +3,7 @@
 require 'sneakers/laces'
 require 'pry-byebug'
 
-Sneakers.configure amqp: 'amqp://localhost/sneakers_laces'
+Dir['./spec/support/**/*.rb'].each { |file| require file }
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

@@ -7,29 +7,34 @@ module Sneakers
         {}
       end
 
+      def initialize(worker_classes = [])
+        @worker_classes = worker_classes
+      end
+
       def consumers
-        consumers_mapping.map do |worker_tag, worker_module|
-          grouped_queues.fetch(worker_tag.to_s, []).map do |queue|
-            consumers_by_queues[queue.name] ||= build_worker_class(worker_module, queue)
+        consumers = []
+
+        worker_classes.map do |worker_class|
+          grouped_queues.fetch(worker_class.consumer_tag, []).map do |queue|
+            consumers << consumers_by_queues[queue.name] ||= build_worker_class(worker_class, queue)
           end
         end
 
-        consumers_by_queues.values
+        consumers
       end
 
       private
 
-      def consumers_mapping
-        Sneakers::Laces.config.consumers_mapping
+      def worker_classes
+        @worker_classes.any? ? @worker_classes : Sneakers::Laces::Worker::Classes
       end
 
-      def build_worker_class(worker_module, queue)
-        Class.new do
+      def build_worker_class(worker_class, queue)
+        Class.new(worker_class) do
           include Sneakers::Worker
-          include worker_module
 
           from_queue  queue.fetch(:name),
-                      arguments: queue.fetch(:arguments)
+                      worker_class.consumer_opts.deep_merge(arguments: queue.fetch(:arguments))
         end
       end
 
