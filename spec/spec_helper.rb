@@ -18,6 +18,11 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     Sneakers::Laces.api_client.create_vhost(Sneakers::Laces.config.vhost)
+    Sneakers::Laces.api_client.update_permissions_of  Sneakers::Laces.config.vhost,
+                                                      'guest',
+                                                      write: '.*',
+                                                      read: '.*',
+                                                      configure: '.*'
   end
 
   config.after(:suite) do
