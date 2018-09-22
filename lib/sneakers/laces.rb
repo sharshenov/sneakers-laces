@@ -9,6 +9,7 @@ require 'sneakers/laces/configuration'
 require 'sneakers/laces/queue_manager'
 require 'sneakers/laces/worker_manager'
 require 'sneakers/laces/worker'
+require 'sneakers/laces/reload_worker'
 require 'sneakers'
 
 module Sneakers
@@ -25,6 +26,10 @@ module Sneakers
 
       def api_client
         @api_client ||= RabbitMQ::HTTP::Client.new(config.rabbitmq_api_endpoint)
+      end
+
+      def reload(worker_tag:)
+        Sneakers.publish('reload, please', routing_key: ReloadWorker.routing_key(worker_tag: worker_tag))
       end
     end
   end

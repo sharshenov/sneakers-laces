@@ -9,10 +9,11 @@ module Sneakers
 
       def initialize(worker_classes = [])
         @worker_classes = worker_classes
+        configure_reload_worker
       end
 
       def workers
-        workers = []
+        workers = [ReloadWorker]
 
         worker_classes.map do |worker_class|
           grouped_queues.fetch(worker_class.worker_tag, []).map do |queue|
@@ -24,6 +25,10 @@ module Sneakers
       end
 
       private
+
+      def configure_reload_worker
+        ReloadWorker.configure(worker_tags: worker_classes.map(&:worker_tag))
+      end
 
       def worker_classes
         @worker_classes.any? ? @worker_classes : Sneakers::Laces::Worker::Classes
