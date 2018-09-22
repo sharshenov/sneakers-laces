@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email    = ['rustam@sharshenov.com']
 
   spec.summary      = 'Configure your Sneakers worker on-the-fly'
-  spec.description  = 'Subscribe your Sneakers workers to queues by name regexes without process restart'
+  spec.description  = 'Subscribe your Sneakers workers to dynamically added/removed queues without process restart'
   spec.homepage     = 'https://github.com/sharshenov/sneakers-laces'
   spec.license      = 'MIT'
 
