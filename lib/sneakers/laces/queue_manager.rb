@@ -17,6 +17,9 @@ module Sneakers
 
       def list_queues
         api_client.list_queues(vhost)
+      rescue Faraday::ResourceNotFound
+        Sneakers.logger.error("Vhost '#{vhost}' does not exist.")
+        []
       end
 
       def delete_queue(name:)
