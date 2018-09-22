@@ -11,12 +11,12 @@ module Sneakers
       end
 
       module ClassMethods
-        attr_reader :consumer_opts
-        attr_reader :consumer_tag
+        attr_reader :worker_opts
+        attr_reader :worker_tag
 
         def from_tag(tag, opts = { routing_key: [] })
-          @consumer_tag   = tag.to_s
-          @consumer_opts  = opts
+          @worker_tag   = tag.to_s
+          @worker_opts  = opts
         end
       end
     end

@@ -7,7 +7,7 @@ require 'active_support/core_ext'
 require 'sneakers/laces/version'
 require 'sneakers/laces/configuration'
 require 'sneakers/laces/queue_manager'
-require 'sneakers/laces/consumer_manager'
+require 'sneakers/laces/worker_manager'
 require 'sneakers/laces/worker'
 require 'sneakers'
 

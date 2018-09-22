@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-describe Sneakers::Laces::ConsumerManager, '#consumers' do
-  subject(:consumers) { manager.consumers }
+describe Sneakers::Laces::WorkerManager, '#workers' do
+  subject(:workers) { manager.workers }
 
   let(:queue_manager) { Sneakers::Laces::QueueManager.new }
 
@@ -23,11 +23,11 @@ describe Sneakers::Laces::ConsumerManager, '#consumers' do
     it { is_expected.to be_a Array }
 
     it 'defines sneakers consumers' do
-      expect(consumers.map(&:queue_name)).to eq %w[queue1 queue2 queue3]
+      expect(workers.map(&:queue_name)).to eq %w[queue1 queue2 queue3]
     end
 
     it 'defines consumers with proper ancestors' do
-      expect(consumers.map { |c| c.new.work('args') }).to eq %w[args_one args_one args_two]
+      expect(workers.map { |c| c.new.work('args') }).to eq %w[args_one args_one args_two]
     end
   end
 
@@ -37,11 +37,11 @@ describe Sneakers::Laces::ConsumerManager, '#consumers' do
     it { is_expected.to be_a Array }
 
     it 'defines sneakers consumers' do
-      expect(consumers.map(&:queue_name)).to eq %w[queue1 queue2]
+      expect(workers.map(&:queue_name)).to eq %w[queue1 queue2]
     end
 
     it 'defines consumers with proper ancestors' do
-      expect(consumers.map { |c| c.new.work('args') }).to eq %w[args_one args_one]
+      expect(workers.map { |c| c.new.work('args') }).to eq %w[args_one args_one]
     end
   end
 end

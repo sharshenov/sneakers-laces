@@ -2,8 +2,8 @@
 
 module Sneakers
   module Laces
-    class ConsumerManager
-      cattr_accessor :consumers_by_queues do
+    class WorkerManager
+      cattr_accessor :workers_by_queues do
         {}
       end
 
@@ -11,16 +11,16 @@ module Sneakers
         @worker_classes = worker_classes
       end
 
-      def consumers
-        consumers = []
+      def workers
+        workers = []
 
         worker_classes.map do |worker_class|
-          grouped_queues.fetch(worker_class.consumer_tag, []).map do |queue|
-            consumers << consumers_by_queues[queue.name] ||= build_worker_class(worker_class, queue)
+          grouped_queues.fetch(worker_class.worker_tag, []).map do |queue|
+            workers << workers_by_queues[queue.name] ||= build_worker_class(worker_class, queue)
           end
         end
 
-        consumers
+        workers
       end
 
       private
@@ -34,7 +34,7 @@ module Sneakers
           include Sneakers::Worker
 
           from_queue  queue.fetch(:name),
-                      worker_class.consumer_opts.deep_merge(arguments: queue.fetch(:arguments))
+                      worker_class.worker_opts.deep_merge(arguments: queue.fetch(:arguments))
         end
       end
 
