@@ -1,8 +1,10 @@
-# Sneakers::Laces [![Build Status](https://travis-ci.org/sharshenov/sneakers-laces.svg?branch=master)](https://travis-ci.org/sharshenov/sneakers-laces)
+# Laces for [sneakers](https://github.com/jondot/sneakers) [![Build Status](https://travis-ci.org/sharshenov/sneakers-laces.svg?branch=master)](https://travis-ci.org/sharshenov/sneakers-laces) [![Gem Version](https://badge.fury.io/rb/sneakers-laces.svg)](https://badge.fury.io/rb/sneakers-laces)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sneakers/laces`. To experiment with that code, run `bin/console` for an interactive prompt.
+The project allows you to manage Sneakers queue processing dynamically. It uses RabbitMQ HTTP API to manage queues and utilizes [live restart](https://github.com/treasure-data/serverengine#live-restart) to reload workers.
 
-TODO: Delete this and the text above, and describe your gem
+It can be helpful for processing IO-jobs grouped by some criteria without waiting for jobs with other criterias to be executed. Imagine requesting some remote API on user basis. Requests of particular user can be executed in parallel and should not be postponed by requests of other users.
+
+With help of the Sneakers::Laces you can declare worker classes with multiple queues per worker class. When you declare or delete a queue the worker is gracefully reloads itself without main process restart(Side effect: It is a docker-friendly solution).
 
 ## Installation
 
@@ -20,19 +22,55 @@ Or install it yourself as:
 
     $ gem install sneakers-laces
 
-## Usage
+## Usage on consumer-side
 
-TODO: Write usage instructions here
+Declare your workers and run instance
+```ruby
+require 'sneakers/laces'
 
-## Development
+# Be sure to configure Sneakers same way as on producer side
+Sneakers.configure
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+class RequestAPIWorker
+  include Sneakers::Laces::Worker
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+  from_tag :api_requester
+
+  def work(message)
+    logger.info("Doing some API request for #{message}")
+    ack!
+  end
+end
+
+require 'sneakers/laces/runner'
+
+Sneakers::Laces::Runner.new.run
+```
+
+## Usage on producer-side
+
+```ruby
+require 'sneakers/laces'
+
+# Be sure to configure Sneakers same way as on consumer side
+Sneakers.configure
+
+queue_manager = Sneakers::Laces::QueueManager.new
+
+# This will declare queue, bindings, and send message to reload workers
+queue_manager.declare_queue name: 'user_1', worker_tag: 'api_requester'
+queue_manager.declare_queue name: 'user_2', worker_tag: 'api_requester'
+
+Sneakers.publish('user 1', to_queue: 'user_1')
+Sneakers.publish('user 2', to_queue: 'user_2')
+
+# This will delete queue and send message to reload workers
+queue_manager.delete_queue name: 'user_2', worker_tag: 'api_requester'
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sneakers-laces.
+Bug reports and pull requests are welcome on [GitHub](https://github.com/sharshenov/sneakers-laces).
 
 ## License
 
