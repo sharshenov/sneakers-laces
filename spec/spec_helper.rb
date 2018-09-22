@@ -17,12 +17,18 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.before(:suite) do
+    Sneakers.configure exchange: 'sneakers_laces'
     Sneakers::Laces.api_client.create_vhost(Sneakers::Laces.config.vhost)
     Sneakers::Laces.api_client.update_permissions_of  Sneakers::Laces.config.vhost,
                                                       'guest',
                                                       write: '.*',
                                                       read: '.*',
                                                       configure: '.*'
+    Sneakers::Laces.api_client.declare_exchange(Sneakers::Laces.config.vhost, 'sneakers_laces')
+  end
+
+  config.before do
+    allow(Sneakers).to receive(:publish)
   end
 
   config.after(:suite) do

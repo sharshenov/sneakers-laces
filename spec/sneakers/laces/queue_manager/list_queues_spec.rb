@@ -8,7 +8,7 @@ describe Sneakers::Laces::QueueManager, '#list_queues' do
   context 'when vhost has queues' do
     before  { manager.declare_queue name: 'foo', worker_tag: 'bar' }
 
-    after   { manager.delete_queue name: 'foo' }
+    after   { manager.delete_queue name: 'foo', worker_tag: 'bar' }
 
     it { is_expected.to be_a Array }
 

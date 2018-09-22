@@ -15,9 +15,9 @@ describe Sneakers::Laces::WorkerManager, '#workers' do
   end
 
   after do
-    queue_manager.delete_queue name: 'queue1'
-    queue_manager.delete_queue name: 'queue2'
-    queue_manager.delete_queue name: 'queue3'
+    queue_manager.delete_queue name: 'queue1', worker_tag: 'consumer_one'
+    queue_manager.delete_queue name: 'queue2', worker_tag: 'consumer_one'
+    queue_manager.delete_queue name: 'queue3', worker_tag: 'consumer_two'
   end
 
   context 'when no worker classes provided' do

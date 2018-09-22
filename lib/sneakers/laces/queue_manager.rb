@@ -5,10 +5,14 @@ module Sneakers
     class QueueManager
       WORKER_TAG_ARGUMENT = 'x-worker-tag'
 
-      def declare_queue(name:, worker_tag:, params: {})
+      def declare_queue(name:, worker_tag:, routing_key: nil, binding_arguments: [], params: {}, reload: true)
         api_client.declare_queue  vhost,
                                   name,
                                   params_with_worker_tag(worker_tag, params)
+
+        api_client.bind_queue(vhost, name, exchange, (routing_key || name), binding_arguments)
+
+        reload_worker(worker_tag) if reload
       end
 
       def grouped_queues
@@ -22,8 +26,10 @@ module Sneakers
         []
       end
 
-      def delete_queue(name:)
+      def delete_queue(name:, worker_tag:, reload: true)
         api_client.delete_queue vhost, name
+
+        reload_worker(worker_tag) if reload
       rescue Faraday::ResourceNotFound
         false
       end
@@ -33,6 +39,10 @@ module Sneakers
       end
 
       private
+
+      def reload_worker(worker_tag)
+        Sneakers::Laces.reload(worker_tag: worker_tag)
+      end
 
       def filtered_queues
         list_queues.select { |q| q.arguments[WORKER_TAG_ARGUMENT].present? }
@@ -50,6 +60,10 @@ module Sneakers
 
       def vhost
         Sneakers::Laces.config.vhost
+      end
+
+      def exchange
+        Sneakers::CONFIG.fetch(:exchange)
       end
     end
   end

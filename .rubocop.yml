@@ -17,3 +17,7 @@ Naming/ConstantName:
 Style/MutableConstant:
   Exclude:
     - 'lib/sneakers/laces/worker.rb'
+
+Metrics/ParameterLists:
+  Exclude:
+    - 'lib/sneakers/laces/queue_manager.rb'
