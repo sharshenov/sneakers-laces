@@ -11,6 +11,8 @@ describe Sneakers::Laces::QueueManager, '#grouped_queues' do
     manager.declare_queue(name: 'queue_3', worker_tag: 'bar')
     manager.declare_queue(name: 'queue_4', worker_tag: 'baz')
 
+    manager.pause_queue(name: 'queue_3', worker_tag: 'bar')
+
     Sneakers::Laces.api_client.declare_queue Sneakers::Laces.config.vhost, 'queue_5', {}
   end
 
@@ -23,7 +25,7 @@ describe Sneakers::Laces::QueueManager, '#grouped_queues' do
   end
 
   it 'returns queues with worker tag only' do
-    expect(grouped_queues.values.flatten.map(&:name).to_set).to eq %w[queue_1 queue_2 queue_3 queue_4].to_set
+    expect(grouped_queues.values.flatten.map(&:name).to_set).to eq %w[queue_1 queue_2 queue_4].to_set
   end
 
   it 'groups queues by worker tag' do
