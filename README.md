@@ -66,6 +66,15 @@ Sneakers.publish('user 2', to_queue: 'user_2')
 
 # This will delete queue and send message to reload workers
 queue_manager.delete_queue name: 'user_2', worker_tag: 'api_requester'
+
+# This will pause queue by creating a extra binding and send message to reload workers
+queue_manager.pause_queue name: 'user_1', worker_tag: 'api_requester'
+
+# You still can publish to a "paused" queues
+Sneakers.publish('user 1', to_queue: 'user_1')
+
+# Make queue "processable" again
+queue_manager.unpause_queue name: 'user_1', worker_tag: 'api_requester'
 ```
 
 ## Contributing
