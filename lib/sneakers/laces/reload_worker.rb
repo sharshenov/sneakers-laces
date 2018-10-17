@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'sneakers/handlers/oneshot'
+
 module Sneakers
   module Laces
     class ReloadWorker
       DEFAULT_OPTS = {
-        threads:      1,
+        threads: 1,
+        handler: Sneakers::Handlers::Oneshot,
         queue_options: {
           exclusive:   true,
           auto_delete: true,
