@@ -10,7 +10,7 @@ module Sneakers
       def declare_queue(name:, worker_tag:, routing_key: nil, binding_arguments: [], params: {}, reload: true)
         api_client.declare_queue  vhost,
                                   name,
-                                  params_with_worker_tag(worker_tag, params)
+                                  params_for_queue(name, worker_tag, params)
 
         api_client.bind_queue(vhost, name, exchange, (routing_key || name), binding_arguments)
 
@@ -78,9 +78,10 @@ module Sneakers
         end
       end
 
-      def params_with_worker_tag(worker_tag, params = {})
+      def params_for_queue(name, worker_tag, params = {})
         Sneakers::CONFIG.fetch(:queue_options).merge(params.deep_symbolize_keys).tap do |p|
-          p[:arguments][WORKER_TAG_ARGUMENT] = worker_tag
+          p[:arguments][WORKER_TAG_ARGUMENT]      = worker_tag
+          p[:arguments]['x-dead-letter-exchange'] = retry_exchange_name(name) if maxretry_handler_enabled?
         end
       end
 
@@ -94,6 +95,14 @@ module Sneakers
 
       def exchange
         Sneakers::CONFIG.fetch(:exchange)
+      end
+
+      def retry_exchange_name(name)
+        [name, 'retry'].join('-')
+      end
+
+      def maxretry_handler_enabled?
+        Sneakers::CONFIG[:handler] && Sneakers::CONFIG[:handler].name == 'Sneakers::Handlers::Maxretry'
       end
     end
   end

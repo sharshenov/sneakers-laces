@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'sneakers/handlers/maxretry'
+
 describe Sneakers::Laces::QueueManager, '#declare_queue' do
   subject(:declare_queue) do
     manager.declare_queue name:         name,
@@ -140,6 +142,49 @@ describe Sneakers::Laces::QueueManager, '#declare_queue' do
       end
 
       let(:expected_routing_key) { 'custom_routing_key' }
+
+      let(:expected_params) do
+        {
+          'exclusive'   => false,
+          'auto_delete' => false,
+          'durable'     => true
+        }
+      end
+
+      include_examples 'declaring queue'
+    end
+  end
+
+  context 'when maxretry handler configured' do
+    let(:name)        { 'queue_with_maxretry_handler' }
+    let(:worker_tag)  { 'foo_worker' }
+    let(:routing_key) { 'custom_routing_key' }
+    let(:params)      { {} }
+
+    let!(:handler) { Sneakers::CONFIG[:handler] }
+
+    before  { Sneakers::CONFIG[:handler] = Sneakers::Handlers::Maxretry }
+
+    after   { Sneakers::CONFIG[:handler] = handler }
+
+    it 'creates queue' do
+      expect { declare_queue }.to change { manager.list_queues.count }.from(0).to(1)
+    end
+
+    describe 'created queue' do
+      subject(:queue) do
+        declare_queue
+        manager.queue_info name: name
+      end
+
+      let(:expected_arguments) do
+        {
+          'x-worker-tag'            => 'foo_worker',
+          'x-dead-letter-exchange'  => 'queue_with_maxretry_handler-retry'
+        }
+      end
+
+      let(:expected_routing_key) { 'queue_with_maxretry_handler' }
 
       let(:expected_params) do
         {
